@@ -1,5 +1,7 @@
 {
   "version": 2,
+
+  "outputDirectory": "dist/public",
   "builds": [
     {
       "src": "server/index.ts",
@@ -13,20 +15,25 @@
       }
     }
   ],
+  "routes": [
+   
+    {
+      "src": "/api/(.*)",
+      "dest": "server/index.ts"
+    },
+   
+    {
+      "src": "/(?!api/)(.*)",  
+      "dest": "dist/public/$1"
+    },
+   
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
   "env": {
     "NODE_ENV": "production",
     "VERCEL": "1"
-  },
-  "rewrites": [
-    { 
-      "source": "/(.*)", 
-      "destination": "dist/public/$1",
-      "has": [
-        {
-          "type": "header",
-          "key": "x-forwarded-for"
-        }
-      ]
-    }
-  ]
+  }
 }
