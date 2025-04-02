@@ -1,8 +1,6 @@
 {
   "version": 2,
-  
   "builds": [
-  
     {
       "src": "package.json",
       "use": "@vercel/static-build",
@@ -11,30 +9,17 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/api/images/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "server/index.ts"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "VERCEL": "1"
-  },
   "rewrites": [
-    { 
-      "source": "/(.*)", 
+    {
+      "source": "/api/images/(.*)",
+      "destination": "server/index.ts"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "server/index.ts"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/api/$1",
       "has": [
         {
@@ -42,6 +27,10 @@
           "key": "x-forwarded-for"
         }
       ]
+    },
+    {
+      "source": "/(.*)",
+      "destination": "server/index.ts"
     }
   ]
 }
