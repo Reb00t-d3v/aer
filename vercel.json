@@ -1,6 +1,5 @@
 {
   "version": 2,
-
   "builds": [
     {
       "src": "server/index.ts",
@@ -12,23 +11,6 @@
       "config": {
         "distDir": "dist/public"
       }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/images/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "server/index.ts"
     }
   ],
   "env": {
