@@ -1,32 +1,31 @@
 {
+  "routes": [
+    {
+      "src": "/api/images/(.*)",
+      "dest": "server/index.ts"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "server/index.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server/index.ts"
+    }
+  ],
   "rewrites": [
-    {
-      "source": "/api/login",
-      "destination": "/api/login.ts"
-    },
-    {
-      "source": "/api/register",
-      "destination": "/api/register.ts"
-    },
-    {
-      "source": "/api/remove-background",
-      "destination": "/api/remove-background.ts"
-    },
-    {
-      "source": "/api/images",
-      "destination": "/api/images.ts"
-    },
-    {
-      "source": "/api/image",
-      "destination": "/api/image.ts"
-    },
-    {
-      "source": "/api/user",
-      "destination": "/api/user.ts"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/"
+    { 
+      "source": "/(.*)", 
+      "destination": "/api/$1",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-forwarded-for"
+        }
+      ]
     }
   ]
 }
