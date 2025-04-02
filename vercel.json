@@ -17,14 +17,16 @@
     "NODE_ENV": "production",
     "VERCEL": "1"
   },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/public/$1"
+  "rewrites": [
+    { 
+      "source": "/(.*)", 
+      "destination": "dist/public/$1",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-forwarded-for"
+        }
+      ]
     }
   ]
 }
