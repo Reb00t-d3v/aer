@@ -63,6 +63,7 @@ __export(schema_exports, {
 });
 import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 var users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -83,6 +84,8 @@ var insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   email: true
+}).extend({
+  processingCount: z.number().default(0)
 });
 var insertImageSchema = createInsertSchema(images).pick({
   userId: true,

@@ -1,3 +1,5 @@
+// api/register.ts
+
 import { VercelResponse } from '@vercel/node';
 import { storage } from '../server/storage';
 import { insertUserSchema } from '../shared/schema';
@@ -46,9 +48,9 @@ export default async function handler(req: AuthenticatedRequest, res: VercelResp
     const user = await storage.createUser({
       ...userData,
       password: hashedPassword,
-      processingCount: 0,
-      subscriptionPlan: 'free',
-      freeTrialUsed: false
+      processingCount: 0, // Default processing count
+      subscriptionPlan: 'free', // Default subscription plan
+      freeTrialUsed: false, // Default free trial flag
     });
     
     // Log in the user if login function exists

@@ -22,8 +22,11 @@ export const images = pgTable("images", {
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
+  
   password: true,
   email: true,
+}).extend({
+  processingCount: z.number().default(0), 
 });
 
 export const insertImageSchema = createInsertSchema(images).pick({
