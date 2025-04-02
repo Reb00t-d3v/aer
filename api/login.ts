@@ -1,51 +1,43 @@
-import { VercelResponse } from '@vercel/node';
-import passport from 'passport';
-import express from 'express';
-import { json } from 'body-parser';
-import { AuthenticatedRequest } from './types';
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import { storage } from '../server/storage';
+import { scrypt } from 'crypto';
+import { promisify } from 'util';
+import jwt from 'jsonwebtoken';
 
-const app = express();
-app.use(json());
+const scryptAsync = promisify(scrypt);
 
-export default async function handler(req: AuthenticatedRequest, res: VercelResponse) {
-  // Only allow POST method
+async function comparePasswords(supplied: string, stored: string) {
+  const [hashed, salt] = stored.split('.');
+  const hashedBuf = Buffer.from(hashed, 'hex');
+  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+  return hashedBuf.equals(suppliedBuf);
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  return new Promise<void>((resolve) => {
-    passport.authenticate('local', (err: any, user: any, info: any) => {
-      if (err) {
-        console.error('Login error:', err);
-        res.status(500).json({ error: 'Internal server error' });
-        return resolve();
-      }
-      
-      if (!user) {
-        res.status(401).json({ error: info?.message || 'Invalid credentials' });
-        return resolve();
-      }
-      
-      if (req.login) {
-        req.login(user, (loginErr: any) => {
-          if (loginErr) {
-            console.error('Login session error:', loginErr);
-            res.status(500).json({ error: 'Error establishing session' });
-            return resolve();
-          }
-          
-          // Don't send password back to client
-          const { password, ...userWithoutPassword } = user;
-          
-          res.status(200).json(userWithoutPassword);
-          resolve();
-        });
-      } else {
-        // If login function isn't available, just return the user
-        const { password, ...userWithoutPassword } = user;
-        res.status(200).json(userWithoutPassword);
-        resolve();
-      }
-    })(req, res);
-  });
+  if (!req.body) {
+    return res.status(400).json({ error: 'No request body provided' });
+  }
+
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    const user = await storage.getUserByUsername(username);
+    if (!user || !(await comparePasswords(password, user.password))) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'your-secret', { expiresIn: '7d' });
+    const { password: _, ...userWithoutPassword } = user;
+    return res.status(200).json({ user: userWithoutPassword, token });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
 }
