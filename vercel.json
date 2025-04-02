@@ -1,12 +1,47 @@
 {
-  "rewrites": [
+  "version": 2,
+  
+  "builds": [
+  
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/images/(.*)",
+      "dest": "server/index.ts"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/api/(.*)",
+      "dest": "server/index.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server/index.ts"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "VERCEL": "1"
+  },
+  "rewrites": [
+    { 
+      "source": "/(.*)", 
+      "destination": "/api/$1",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-forwarded-for"
+        }
+      ]
     }
   ]
 }
