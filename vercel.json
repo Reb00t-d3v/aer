@@ -1,24 +1,15 @@
 {
-  "routes": [
-    {
-      "src": "/api/images/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "server/index.ts"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "server/index.ts"
-    }
-  ],
   "rewrites": [
-    { 
-      "source": "/(.*)", 
+    {
+      "source": "/api/images/(.*)",
+      "destination": "/api/images/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/api/$1",
       "has": [
         {
